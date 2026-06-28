@@ -7,9 +7,10 @@ Single-file Expo Snack app inspired by Zalando-style fast fashion e-commerce.
 1. Open [https://snack.expo.dev/](https://snack.expo.dev/)
 2. Replace the contents of `App.js` with the code from this repository
 3. Ensure these dependencies are present (Snack usually includes them by default):
-   - `expo-linear-gradient`
    - `@expo/vector-icons`
    - `react-native-safe-area-context`
+
+No `expo-linear-gradient` or `expo-status-bar` required — gradients use pure React Native Views.
 4. Scan the QR code with **Expo Go** on your phone
 
 ## Features

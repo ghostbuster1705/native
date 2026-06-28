@@ -1523,7 +1523,7 @@ const styles = StyleSheet.create({
   profileName: { fontSize: 20, fontWeight: '700', color: C.ink },
   profileEmail: { fontSize: 14, color: C.inkSoft, marginTop: 2 },
   loyaltyCard: { borderRadius: 16, overflow: 'hidden', marginBottom: 24 },
-  loyaltyGrad: { padding: 20 },
+  loyaltyGrad: { padding: 20, backgroundColor: '#1F1F1F' },
   loyaltyLabel: { fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.6)', letterSpacing: 2 },
   loyaltyPoints: { fontSize: 28, fontWeight: '800', color: '#FFF', marginTop: 4 },
   loyaltyHint: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4 },
