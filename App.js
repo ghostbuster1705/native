@@ -14,7 +14,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -1047,8 +1046,7 @@ function AppContent() {
 
   return (
     <View style={styles.flex}>
-      <StatusBar barStyle="dark-content" />
-      <ExpoStatusBar style="dark" />
+      <StatusBar barStyle="dark-content" backgroundColor={C.bg} />
 
       {tab !== 'home' && (
         <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
