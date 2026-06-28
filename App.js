@@ -14,7 +14,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -220,6 +219,41 @@ const fmt = (n) => `€${n.toFixed(2)}`;
 const discount = (price, original) =>
   original ? Math.round((1 - price / original) * 100) : 0;
 
+// Pure-RN gradient overlays (no expo-linear-gradient needed)
+function VerticalShade({ fromOpacity = 0.05, toOpacity = 0.65, style }) {
+  const layers = 16;
+  return (
+    <View style={[StyleSheet.absoluteFill, style]} pointerEvents="none">
+      {Array.from({ length: layers }).map((_, i) => (
+        <View
+          key={i}
+          style={{
+            flex: 1,
+            backgroundColor: `rgba(0,0,0,${fromOpacity + ((toOpacity - fromOpacity) * i) / (layers - 1)})`,
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
+function TopShade({ maxOpacity = 0.35, style }) {
+  const layers = 10;
+  return (
+    <View style={[style, { overflow: 'hidden' }]} pointerEvents="none">
+      {Array.from({ length: layers }).map((_, i) => (
+        <View
+          key={i}
+          style={{
+            flex: 1,
+            backgroundColor: `rgba(0,0,0,${maxOpacity * (1 - i / (layers - 1))})`,
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
 // ─── Hooks ───────────────────────────────────────────────────────────────────
 function usePressScale(toValue = 0.96) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -395,7 +429,7 @@ function HeroCarousel({ onCtaPress }) {
           return (
             <Animated.View style={{ width: SCREEN_W, height: HERO_H, transform: [{ scale }], opacity }}>
               <Image source={{ uri: item.image }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-              <LinearGradient colors={item.gradient} style={StyleSheet.absoluteFill} />
+              <VerticalShade fromOpacity={0.05} toOpacity={0.65} />
               <View style={styles.heroContent}>
                 <Text style={styles.heroTitle}>{item.title}</Text>
                 <Text style={styles.heroSubtitle}>{item.subtitle}</Text>
@@ -670,7 +704,7 @@ function ProductDetailScreen({ product, onBack, onAddToCart, onFavorite, isFavor
               <Image source={{ uri: item }} style={styles.detailImage} resizeMode="cover" />
             )}
           />
-          <LinearGradient colors={['rgba(0,0,0,0.35)', 'transparent']} style={styles.detailTopGrad} />
+          <TopShade maxOpacity={0.35} style={styles.detailTopGrad} />
           <View style={[styles.detailTopBar, { paddingTop: insets.top + 8 }]}>
             <IconBtn name="close" onPress={close} color="#FFF" />
             <IconBtn
@@ -893,14 +927,14 @@ function ProfileScreen() {
       </View>
 
       <View style={styles.loyaltyCard}>
-        <LinearGradient colors={['#1A1A1A', '#333']} style={styles.loyaltyGrad}>
+        <View style={styles.loyaltyGrad}>
           <Text style={styles.loyaltyLabel}>STYLE CLUB</Text>
           <Text style={styles.loyaltyPoints}>2,450 pts</Text>
           <Text style={styles.loyaltyHint}>€25 reward at 3,000 pts</Text>
           <View style={styles.loyaltyBar}>
             <View style={[styles.loyaltyFill, { width: '82%' }]} />
           </View>
-        </LinearGradient>
+        </View>
       </View>
 
       {menu.map((m, i) => (
