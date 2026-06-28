@@ -14,8 +14,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const CARD_W = (SCREEN_W - 48) / 2;
@@ -37,6 +35,66 @@ const C = {
 };
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+
+// Zero external deps — icons + safe area via React Native only
+const ICONS = {
+  'checkmark-circle': '✓',
+  heart: '♥',
+  'heart-outline': '♡',
+  star: '★',
+  'star-outline': '☆',
+  'arrow-forward': '→',
+  search: '⌕',
+  'search-outline': '⌕',
+  close: '✕',
+  'close-circle': '⊗',
+  'bag-outline': '▢',
+  bag: '▣',
+  'bag-add-outline': '＋',
+  'home-outline': '⌂',
+  home: '⌂',
+  'person-outline': '○',
+  person: '●',
+  'notifications-outline': '◌',
+  'options-outline': '⋮',
+  'trash-outline': '⌫',
+  remove: '−',
+  add: '+',
+  'chevron-forward': '›',
+  'woman-outline': '♀',
+  'man-outline': '♂',
+  'footsteps-outline': '◎',
+  'fitness-outline': '◆',
+  'pricetag-outline': '%',
+  'grid-outline': '▦',
+  'car-outline': '◇',
+  'refresh-outline': '↻',
+  'shield-checkmark-outline': '✓',
+  'location-outline': '◎',
+  'card-outline': '▭',
+  'help-circle-outline': '?',
+  'document-text-outline': '≡',
+};
+
+function Icon({ name, size = 20, color = C.ink, style }) {
+  return (
+    <Text style={[{ fontSize: size, color, lineHeight: size * 1.15, textAlign: 'center' }, style]}>
+      {ICONS[name] || '•'}
+    </Text>
+  );
+}
+
+function useInsets() {
+  return useMemo(
+    () => ({
+      top: Platform.select({ ios: 50, android: StatusBar.currentHeight || 24, default: 0 }),
+      bottom: Platform.select({ ios: 28, android: 12, default: 0 }),
+      left: 0,
+      right: 0,
+    }),
+    []
+  );
+}
 
 // ─── Mock data ───────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -219,7 +277,7 @@ const fmt = (n) => `€${n.toFixed(2)}`;
 const discount = (price, original) =>
   original ? Math.round((1 - price / original) * 100) : 0;
 
-// Pure-RN gradient overlays (no expo-linear-gradient needed)
+// Pure-RN gradient overlays (no extra packages needed)
 function VerticalShade({ fromOpacity = 0.05, toOpacity = 0.65, style }) {
   const layers = 16;
   return (
@@ -291,7 +349,7 @@ function Toast({ message, visible, onHide }) {
   if (!visible) return null;
   return (
     <Animated.View style={[styles.toast, { transform: [{ translateY }] }]}>
-      <Ionicons name="checkmark-circle" size={18} color={C.success} />
+      <Icon name="checkmark-circle" size={18} color={C.success} />
       <Text style={styles.toastText}>{message}</Text>
     </Animated.View>
   );
@@ -312,7 +370,7 @@ function IconBtn({ name, onPress, badge, size = 22, color = C.ink }) {
   return (
     <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
       <Animated.View style={[styles.iconBtn, { transform: [{ scale }] }]}>
-        <Ionicons name={name} size={size} color={color} />
+        <Icon name={name} size={size} color={color} />
         {badge > 0 && (
           <View style={styles.iconBadge}>
             <Text style={styles.iconBadgeText}>{badge > 9 ? '9+' : badge}</Text>
@@ -353,7 +411,7 @@ function ProductCard({ item, onPress, onFavorite, isFavorite, index = 0 }) {
             )}
             <Pressable style={styles.cardFavBtn} onPress={toggleFav} hitSlop={8}>
               <Animated.View style={{ transform: [{ scale: favScale }] }}>
-                <Ionicons
+                <Icon
                   name={isFavorite ? 'heart' : 'heart-outline'}
                   size={20}
                   color={isFavorite ? C.accent : C.ink}
@@ -374,7 +432,7 @@ function ProductCard({ item, onPress, onFavorite, isFavorite, index = 0 }) {
               )}
             </View>
             <View style={styles.cardRating}>
-              <Ionicons name="star" size={12} color={C.gold} />
+              <Icon name="star" size={12} color={C.gold} />
               <Text style={styles.cardRatingText}>{item.rating}</Text>
             </View>
           </View>
@@ -435,7 +493,7 @@ function HeroCarousel({ onCtaPress }) {
                 <Text style={styles.heroSubtitle}>{item.subtitle}</Text>
                 <Pressable style={styles.heroCta} onPress={() => onCtaPress(item)}>
                   <Text style={styles.heroCtaText}>{item.cta}</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#FFF" />
+                  <Icon name="arrow-forward" size={16} color="#FFF" />
                 </Pressable>
               </View>
             </Animated.View>
@@ -456,7 +514,7 @@ function CategoryPill({ item, active, onPress }) {
   return (
     <Pressable onPress={() => onPress(item.id)} onPressIn={onPressIn} onPressOut={onPressOut}>
       <Animated.View style={[styles.catPill, active && styles.catPillActive, { transform: [{ scale }] }]}>
-        <Ionicons name={item.icon} size={16} color={active ? '#FFF' : C.ink} />
+        <Icon name={item.icon} size={16} color={active ? '#FFF' : C.ink} />
         <Text style={[styles.catPillText, active && styles.catPillTextActive]}>{item.label}</Text>
       </Animated.View>
     </Pressable>
@@ -487,7 +545,7 @@ function EmptyState({ icon, title, subtitle, action, onAction }) {
   return (
     <Animated.View style={[styles.empty, { opacity: fade.opacity, transform: [{ translateY: fade.translateY }] }]}>
       <View style={styles.emptyIcon}>
-        <Ionicons name={icon} size={40} color={C.inkMuted} />
+        <Icon name={icon} size={40} color={C.inkMuted} />
       </View>
       <Text style={styles.emptyTitle}>{title}</Text>
       <Text style={styles.emptySubtitle}>{subtitle}</Text>
@@ -607,7 +665,7 @@ function ShopScreen({ onProductPress, onFavorite, favorites, initialCategory }) 
   return (
     <View style={styles.flex}>
       <View style={styles.shopSearch}>
-        <Ionicons name="search" size={18} color={C.inkMuted} />
+        <Icon name="search" size={18} color={C.inkMuted} />
         <TextInput
           style={styles.shopSearchInput}
           placeholder="Search brands, products..."
@@ -617,7 +675,7 @@ function ShopScreen({ onProductPress, onFavorite, favorites, initialCategory }) 
         />
         {query.length > 0 && (
           <Pressable onPress={() => setQuery('')}>
-            <Ionicons name="close-circle" size={18} color={C.inkMuted} />
+            <Icon name="close-circle" size={18} color={C.inkMuted} />
           </Pressable>
         )}
       </View>
@@ -669,7 +727,7 @@ function ShopScreen({ onProductPress, onFavorite, favorites, initialCategory }) 
 }
 
 function ProductDetailScreen({ product, onBack, onAddToCart, onFavorite, isFavorite }) {
-  const insets = useSafeAreaInsets();
+  const insets = useInsets();
   const slideAnim = useRef(new Animated.Value(SCREEN_H)).current;
   const [size, setSize] = useState('M');
   const [color, setColor] = useState(0);
@@ -728,7 +786,7 @@ function ProductDetailScreen({ product, onBack, onAddToCart, onFavorite, isFavor
           <Text style={styles.detailName}>{product.name}</Text>
           <View style={styles.detailRating}>
             {[1, 2, 3, 4, 5].map((s) => (
-              <Ionicons key={s} name={s <= Math.floor(product.rating) ? 'star' : 'star-outline'} size={14} color={C.gold} />
+              <Icon key={s} name={s <= Math.floor(product.rating) ? 'star' : 'star-outline'} size={14} color={C.gold} />
             ))}
             <Text style={styles.detailRatingText}>{product.rating} · 128 reviews</Text>
           </View>
@@ -766,7 +824,7 @@ function ProductDetailScreen({ product, onBack, onAddToCart, onFavorite, isFavor
               { icon: 'shield-checkmark-outline', text: 'Authenticity guaranteed' },
             ].map((p) => (
               <View key={p.text} style={styles.perk}>
-                <Ionicons name={p.icon} size={18} color={C.inkSoft} />
+                <Icon name={p.icon} size={18} color={C.inkSoft} />
                 <Text style={styles.perkText}>{p.text}</Text>
               </View>
             ))}
@@ -779,7 +837,7 @@ function ProductDetailScreen({ product, onBack, onAddToCart, onFavorite, isFavor
           style={styles.addToCartBtn}
           onPress={() => onAddToCart(product, size, product.colors[color])}
         >
-          <Ionicons name="bag-add-outline" size={20} color="#FFF" />
+          <Icon name="bag-add-outline" size={20} color="#FFF" />
           <Text style={styles.addToCartText}>Add to bag · {fmt(product.price)}</Text>
         </Pressable>
       </View>
@@ -803,15 +861,15 @@ function CartItem({ item, index, onUpdateQty, onRemove }) {
       </View>
       <View style={styles.cartActions}>
         <Pressable onPress={() => onRemove(item.key)} hitSlop={8}>
-          <Ionicons name="trash-outline" size={18} color={C.inkMuted} />
+          <Icon name="trash-outline" size={18} color={C.inkMuted} />
         </Pressable>
         <View style={styles.qtyRow}>
           <Pressable style={styles.qtyBtn} onPress={() => onUpdateQty(item.key, item.qty - 1)}>
-            <Ionicons name="remove" size={16} color={C.ink} />
+            <Icon name="remove" size={16} color={C.ink} />
           </Pressable>
           <Text style={styles.qtyText}>{item.qty}</Text>
           <Pressable style={styles.qtyBtn} onPress={() => onUpdateQty(item.key, item.qty + 1)}>
-            <Ionicons name="add" size={16} color={C.ink} />
+            <Icon name="add" size={16} color={C.ink} />
           </Pressable>
         </View>
       </View>
@@ -862,7 +920,7 @@ function CartScreen({ items, onUpdateQty, onRemove, onCheckout }) {
         </View>
         <Pressable style={styles.checkoutBtn} onPress={onCheckout}>
           <Text style={styles.checkoutText}>Checkout</Text>
-          <Ionicons name="arrow-forward" size={18} color="#FFF" />
+          <Icon name="arrow-forward" size={18} color="#FFF" />
         </Pressable>
       </View>
     </View>
@@ -940,10 +998,10 @@ function ProfileScreen() {
       {menu.map((m, i) => (
         <Pressable key={m.label} style={styles.menuItem}>
           <View style={styles.menuLeft}>
-            <Ionicons name={m.icon} size={20} color={C.ink} />
+            <Icon name={m.icon} size={20} color={C.ink} />
             <Text style={styles.menuLabel}>{m.label}</Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={C.inkMuted} />
+          <Icon name="chevron-forward" size={18} color={C.inkMuted} />
         </Pressable>
       ))}
       <View style={{ height: 100 }} />
@@ -961,7 +1019,7 @@ const TABS = [
 ];
 
 function TabBar({ active, onChange, cartCount }) {
-  const insets = useSafeAreaInsets();
+  const insets = useInsets();
   const indicatorX = useRef(new Animated.Value(0)).current;
   const tabW = SCREEN_W / TABS.length;
 
@@ -991,7 +1049,7 @@ function TabBar({ active, onChange, cartCount }) {
           >
             <Animated.View style={{ alignItems: 'center', transform: [{ scale }] }}>
               <View>
-                <Ionicons name={isActive ? tab.activeIcon : tab.icon} size={22} color={isActive ? C.ink : C.inkMuted} />
+                <Icon name={isActive ? tab.activeIcon : tab.icon} size={22} color={isActive ? C.ink : C.inkMuted} />
                 {tab.id === 'cart' && cartCount > 0 && (
                   <View style={styles.tabBadge}>
                     <Text style={styles.tabBadgeText}>{cartCount > 9 ? '9+' : cartCount}</Text>
@@ -1009,7 +1067,7 @@ function TabBar({ active, onChange, cartCount }) {
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 function AppContent() {
-  const insets = useSafeAreaInsets();
+  const insets = useInsets();
   const [tab, setTab] = useState('home');
   const [shopCategory, setShopCategory] = useState('all');
   const [favorites, setFavorites] = useState(new Set(['p1', 'p3']));
@@ -1152,7 +1210,7 @@ function AppContent() {
         <View style={styles.checkoutOverlay}>
           <View style={styles.checkoutSheet}>
             <View style={styles.checkoutIcon}>
-              <Ionicons name="checkmark-circle" size={56} color={C.success} />
+              <Icon name="checkmark-circle" size={56} color={C.success} />
             </View>
             <Text style={styles.checkoutTitle}>Order placed!</Text>
             <Text style={styles.checkoutSub}>
@@ -1178,11 +1236,7 @@ function AppContent() {
 }
 
 export default function App() {
-  return (
-    <SafeAreaProvider>
-      <AppContent />
-    </SafeAreaProvider>
-  );
+  return <AppContent />;
 }
 
 // ─── Styles ────────────────────────────────────────────────────────────────────
